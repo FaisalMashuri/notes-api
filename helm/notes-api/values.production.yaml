@@ -46,7 +46,6 @@ env:
   LOG_LEVEL: info
   DB_HOST: postgres.apps.svc.cluster.local
   DB_NAME: notes
-secretName: notes-api-secret
 
 # --- default chart (dibutuhkan template serviceaccount/hpa/httproute) ---
 serviceAccount:

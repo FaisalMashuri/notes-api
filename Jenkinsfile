@@ -13,29 +13,11 @@ pipeline {
     DOCKER_REGISTRY_URL = 'ghcr.io'
     REGISTRY_PATH       = 'faisalmashuri'
     DOCKER_CREDENTIALS  = credentials('ghcr')     // otomatis tersedia sebagai _USR dan _PSW
+    ENV = "production"
     // ENV, NAMESPACE, APP_URL sengaja tidak di sini: diisi per branch di stage Prepare
   }
 
   stages {
-    stage('Prepare') {
-      steps {
-        script {
-          // Pemetaan branch -> environment. Branch yang tidak ada di sini hanya dites.
-          def targets = [
-            develop: [ENV: 'development', NAMESPACE: 'apps-dev', APP_URL: 'https://api-dev.optio.id'],
-            main   : [ENV: 'production',  NAMESPACE: 'apps',     APP_URL: 'https://api.optio.id'],
-          ]
-          def t = targets[env.BRANCH_NAME]
-          env.DEPLOY = t ? 'true' : 'false'
-          if (t) {
-            env.ENV       = t.ENV
-            env.NAMESPACE = t.NAMESPACE
-            env.APP_URL   = t.APP_URL
-          }
-          echo "Branch ${env.BRANCH_NAME}: deploy=${env.DEPLOY}, env=${env.ENV ?: '-'}"
-        }
-      }
-    }
 
     stage('Test') {                               // jalan di semua branch dan PR
       steps {
