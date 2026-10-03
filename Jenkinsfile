@@ -30,6 +30,7 @@ pipeline {
     }
 
     stage('Build') {
+      when { anyOf { branch 'main'; branch 'develop' } }
       steps {
         sh '''
           IMAGE=$DOCKER_REGISTRY_URL/$REGISTRY_PATH/$PROJECT_NAME
@@ -43,7 +44,7 @@ pipeline {
     }
 
     stage('Deploy') {
-
+      when { anyOf { branch 'main'; branch 'develop' } }
       steps {
         sh '''
           helm upgrade $PROJECT_NAME ./helm/$PROJECT_NAME \
