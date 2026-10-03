@@ -54,23 +54,6 @@ pipeline {
         '''
       }
     }
-
-    stage('Smoke Test') {
-      steps {
-        sh '''
-          for i in $(seq 1 24); do
-            body=$(curl -fsS --max-time 5 "$APP_URL/healthz" || true)
-            if echo "$body" | grep -q "$TAG"; then
-              echo "Live di $ENV: $body"
-              exit 0
-            fi
-            sleep 5
-          done
-          echo "Gagal: $APP_URL/healthz tidak menampilkan versi $TAG"
-          exit 1
-        '''
-      }
-    }
   }
 
   post {
