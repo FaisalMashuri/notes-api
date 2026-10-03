@@ -43,7 +43,7 @@ pipeline {
     }
 
     stage('Deploy') {
-      when { environment name: 'DEPLOY', value: 'true' }
+
       steps {
         sh '''
           helm upgrade $PROJECT_NAME ./helm/$PROJECT_NAME \
