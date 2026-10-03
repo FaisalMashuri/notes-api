@@ -1,3 +1,13 @@
+def blockManualBuildOnMain() {
+  if (env.BRANCH_NAME == 'main') {
+    def manual = currentBuild.getBuildCauses('hudson.model.Cause$UserIdCause')
+    if (manual) {
+      currentBuild.result = 'ABORTED'
+      error("Branch main hanya di-build otomatis dari merge PR. Build manual oleh ${manual[0].userId} ditolak.")
+    }
+  }
+}
+
 pipeline {
   agent any
 
