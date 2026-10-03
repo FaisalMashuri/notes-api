@@ -14,6 +14,7 @@ pipeline {
     REGISTRY_PATH       = 'faisalmashuri'
     DOCKER_CREDENTIALS  = credentials('ghcr')     // otomatis tersedia sebagai _USR dan _PSW
     ENV = "production"
+    NAMESPACE = "apps"
     // ENV, NAMESPACE, APP_URL sengaja tidak di sini: diisi per branch di stage Prepare
   }
 
