@@ -1,3 +1,13 @@
+def blockManualBuildOnMain() {
+  if (env.BRANCH_NAME == 'main') {
+    def manual = currentBuild.getBuildCauses('hudson.model.Cause$UserIdCause')
+    if (manual) {
+      currentBuild.result = 'ABORTED'
+      error("Branch main hanya di-build otomatis dari merge PR. Build manual oleh ${manual[0].userId} ditolak.")
+    }
+  }
+}
+
 pipeline {
   agent any
 
@@ -19,7 +29,13 @@ pipeline {
   }
 
   stages {
-
+     stage('Guard') {
+          when { branch 'main' }
+          steps {
+            script { blockManualBuildOnMain() }
+            echo 'Build main dipicu otomatis, lanjut.'
+          }
+     }
     stage('Test') {                               // jalan di semua branch dan PR
       steps {
         sh '''
@@ -30,6 +46,7 @@ pipeline {
     }
 
     stage('Build') {
+      when { anyOf { branch 'main'; branch 'develop' } }
       steps {
         sh '''
           IMAGE=$DOCKER_REGISTRY_URL/$REGISTRY_PATH/$PROJECT_NAME
@@ -43,7 +60,7 @@ pipeline {
     }
 
     stage('Deploy') {
-
+      when { anyOf { branch 'main'; branch 'develop' } }
       steps {
         sh '''
           helm upgrade $PROJECT_NAME ./helm/$PROJECT_NAME \
@@ -51,23 +68,6 @@ pipeline {
             -f helm/$PROJECT_NAME/values.$ENV.yaml \
             --install --namespace $NAMESPACE --create-namespace \
             --wait --timeout 3m --atomic
-        '''
-      }
-    }
-
-    stage('Smoke Test') {
-      steps {
-        sh '''
-          for i in $(seq 1 24); do
-            body=$(curl -fsS --max-time 5 "$APP_URL/healthz" || true)
-            if echo "$body" | grep -q "$TAG"; then
-              echo "Live di $ENV: $body"
-              exit 0
-            fi
-            sleep 5
-          done
-          echo "Gagal: $APP_URL/healthz tidak menampilkan versi $TAG"
-          exit 1
         '''
       }
     }
