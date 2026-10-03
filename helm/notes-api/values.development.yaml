@@ -1,0 +1,49 @@
+replicaCount: 1                 # tetap 1: data disimpan di memori pod
+
+image:
+  repository: ghcr.io/faisalmashuri/notes-api
+  pullPolicy: IfNotPresent
+  tag: ""                       # diisi pipeline dengan commit SHA
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: true
+  className: traefik
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: api-dev.optio.id
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: api-dev-optio-tls
+      hosts:
+        - api-dev.optio.id
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 32Mi
+  limits:
+    memory: 64Mi
+
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: http
+readinessProbe:
+  httpGet:
+    path: /healthz
+    port: http
+
+# --- tambahan di bagian paling bawah: konfigurasi app ---
+env:
+  APP_ENV: development
+  LOG_LEVEL: debug
+  DB_HOST: postgres.apps-dev.svc.cluster.local
+  DB_NAME: notes_dev
+secretName: notes-api-secret
