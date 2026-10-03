@@ -19,7 +19,13 @@ pipeline {
   }
 
   stages {
-
+     stage('Guard') {
+          when { branch 'main' }
+          steps {
+            script { blockManualBuildOnMain() }
+            echo 'Build main dipicu otomatis, lanjut.'
+          }
+     }
     stage('Test') {                               // jalan di semua branch dan PR
       steps {
         sh '''
