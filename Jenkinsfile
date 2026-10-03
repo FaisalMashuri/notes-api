@@ -30,7 +30,6 @@ pipeline {
     }
 
     stage('Build') {
-      when { environment name: 'DEPLOY', value: 'true' }
       steps {
         sh '''
           IMAGE=$DOCKER_REGISTRY_URL/$REGISTRY_PATH/$PROJECT_NAME
@@ -57,7 +56,6 @@ pipeline {
     }
 
     stage('Smoke Test') {
-      when { environment name: 'DEPLOY', value: 'true' }
       steps {
         sh '''
           for i in $(seq 1 24); do
