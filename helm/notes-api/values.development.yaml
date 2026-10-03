@@ -47,3 +47,19 @@ env:
   DB_HOST: postgres.apps-dev.svc.cluster.local
   DB_NAME: notes_dev
 secretName: notes-api-secret
+
+# --- default chart (dibutuhkan template serviceaccount/hpa/httproute) ---
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+
+httpRoute:
+  enabled: false
